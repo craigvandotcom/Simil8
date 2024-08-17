@@ -11,4 +11,6 @@ V2
 V3
 - [ ] transform weekly notes into a newsletter
 - [ ] publish two/three draft newsletter options to Beehive
-- [ ]   
+
+BUGS:
+- two threads of tweet options being created (instead of one)
