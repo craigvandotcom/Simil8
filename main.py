@@ -9,6 +9,9 @@ import requests
 import logging
 from discord_bot import client as discord_client
 
+# Environment
+print(f"IS_PRODUCTION: {IS_PRODUCTION}")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -37,6 +40,7 @@ if __name__ == "__main__":
         discord_thread.start()
 
         time.sleep(5)  # Wait for the servers to start
+        logging.info("Scheduling the hourly task")
         schedule.every(15).minutes.do(run_task)
         try:
             while True:
@@ -53,6 +57,7 @@ if __name__ == "__main__":
         discord_thread.start()
 
         time.sleep(5)  # Wait for the servers to start
+        logging.info("Running task once for testing")
         run_task()  # Run once for testing
         try:
             while True:
