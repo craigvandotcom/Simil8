@@ -80,8 +80,8 @@ def generate_threads_endpoint():
         logging.error(f"Error in generate_threads_endpoint: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
-@app.route('/run-hourly-task', methods=['POST'])
-def run_hourly_task_endpoint():
+@app.route('/run-frequent-task', methods=['POST'])
+def run_frequent_task_endpoint():
     try:
         highlights = process_highlights()
         results = []
@@ -104,9 +104,9 @@ def run_hourly_task_endpoint():
             }
             results.append(result)
 
-        return jsonify({"message": "Hourly task completed successfully", "results": results})
+        return jsonify({"message": "Frequent task completed successfully", "results": results})
     except Exception as e:
-        logging.error(f"Error in hourly task: {str(e)}", exc_info=True)
+        logging.error(f"Error in frequent task: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 def start_server():

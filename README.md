@@ -113,7 +113,7 @@ The Flask web server provides the following endpoints:
 - `/process-highlights`: Processes Readwise highlights and generates drafts.
 - `/generate-tweets`: Generates tweet variations from provided text.
 - `/generate-threads`: Generates tweet threads from provided text.
-- `/run-hourly-task`: Processes highlights and creates tweet threads periodically.
+- `/run-frequent-task`: Processes highlights and creates tweet threads periodically.
 
 ## Contributing
 

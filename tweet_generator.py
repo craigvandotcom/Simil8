@@ -10,7 +10,6 @@ def generate_tweet_variations(text: str, num_variations: int = 3) -> List[str]:
     Transform the following text into {num_variations} diverse tweet versions:
 
     Text: "{text}"
-    Target Audience: Advanced self-improvers, movement enthusiasts, entrepreneurs, intellectuals, athletes.
 
     Instructions:
     - Create {num_variations} tweet versions, each expanding on the ideas in the given text, offering additional context, or relating it to broader concepts.
@@ -45,8 +44,6 @@ def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
     Transform the following text into a coherent and engaging thread of {num_tweets} tweets:
 
     Text: "{text}"
-
-    Target Audience: Advanced self-improvers, movement enthusiasts, entrepreneurs, intellectuals, athletes.
 
     Thread Structure:
     1. Hook (1 tweet): Capture attention with a surprising fact, question, or bold statement.

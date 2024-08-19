@@ -1,8 +1,11 @@
-import requests
-from datetime import datetime, timedelta
-from typing import List, Dict, Any
-from config import READWISE_TOKEN, IS_PRODUCTION
 import logging
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, List
+
+import requests
+
+from config import IS_PRODUCTION, READWISE_TOKEN
+from timestamp_storage import get_last_fetched_timestamp, update_last_fetched_timestamp
 
 def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, Any]]:
     full_data = []
@@ -29,17 +32,27 @@ def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, An
     return full_data
 
 def process_highlights() -> List[Dict[str, Any]]:
-    if IS_PRODUCTION:
-        fifteen_minutes_ago = (datetime.now() - timedelta(minutes=15)).isoformat()
-        books_data = fetch_from_export_api(updated_after=fifteen_minutes_ago)
+    last_timestamp = get_last_fetched_timestamp()
+
+    if not last_timestamp:
+        logging.info("No last fetched timestamp found. This might be the first run.")
+        time_72_hours_ago = (datetime.utcnow() - timedelta(hours=72)).strftime('%Y-%m-%dT%H:%M:%SZ')
+        books_data = fetch_from_export_api(updated_after=time_72_hours_ago)
     else:
-        books_data = fetch_from_export_api()
-        if books_data and books_data[0].get('highlights'):
-            # Take only the first highlight of the first book in development mode
-            books_data = [{
-                **books_data[0],
-                'highlights': [books_data[0]['highlights'][0]]
-            }]
+        # Adjust the last timestamp to ensure strict "greater than"
+        last_timestamp_dt = datetime.fromisoformat(last_timestamp.replace("Z", "+00:00"))
+        adjusted_timestamp_dt = last_timestamp_dt + timedelta(seconds=1)
+        adjusted_timestamp = adjusted_timestamp_dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        if IS_PRODUCTION:
+            books_data = fetch_from_export_api(updated_after=adjusted_timestamp)
+        else:
+            books_data = fetch_from_export_api()
+            if books_data and books_data[0].get('highlights'):
+                books_data = [{
+                    **books_data[0],
+                    'highlights': [books_data[0]['highlights'][0]]
+                }]
 
     processed_highlights = []
     for book in books_data:
@@ -59,6 +72,15 @@ def process_highlights() -> List[Dict[str, Any]]:
                 'note': highlight.get('note'),
                 'tags': highlight.get('tags', [])
             })
+
+    # Filter out highlights with 'highlighted_at' as None
+    valid_highlight_times = [highlight['highlighted_at'] for highlight in processed_highlights if highlight['highlighted_at'] is not None]
+
+    if valid_highlight_times:
+        latest_highlight_time = max(valid_highlight_times)
+        update_last_fetched_timestamp(latest_highlight_time)
+    else:
+        logging.info("No valid highlights found to update the timestamp")
 
     logging.info(f"Processed {len(processed_highlights)} highlights from {len(books_data)} books")
     return processed_highlights
