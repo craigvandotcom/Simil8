@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
         time.sleep(5)  # Wait for the servers to start
         logging.info("Scheduling the frequent task")
-        schedule.every(1).minutes.do(lambda: asyncio.run(run_frequent_task()))
+        schedule.every(frequent_task_interval).minutes.do(lambda: asyncio.run(run_frequent_task()))
         try:
             while True:
                 schedule.run_pending()

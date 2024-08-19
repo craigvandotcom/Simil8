@@ -12,3 +12,6 @@ IS_PRODUCTION = replit_deployment_raw in truthy_values
 # Log for debugging purposes
 print(f"REPLIT_DEPLOYMENT (raw): {replit_deployment_raw}")
 print(f"IS_PRODUCTION: {IS_PRODUCTION}")
+
+# Personal Preferences
+frequent_task_interval = 1  # in minutes
