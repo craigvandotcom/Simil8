@@ -1,26 +1,12 @@
-# existing imports
-import discord
-import os
+# discord_bot.py
 import logging
-from tweet_generator import generate_tweet_variations
+import os
+
+import discord
+
+from config import DISCORD_TWEET_CHANNEL_ID, DISCORD_THREAD_CHANNEL_ID
+from tweet_generator import generate_tweet_variations, generate_thread
 from typefully_api import create_typefully_draft
-
-# Fetch environment variables
-DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-DISCORD_CHANNEL_IDS = os.getenv('DISCORD_CHANNEL_IDS')
-
-# Validate environment variables
-if not DISCORD_BOT_TOKEN:
-    raise ValueError("DISCORD_BOT_TOKEN environment variable is not set.")
-
-if not DISCORD_CHANNEL_IDS:
-    raise ValueError("DISCORD_CHANNEL_IDS environment variable is not set or empty.")
-
-# Process and validate CHANNEL_IDS
-try:
-    CHANNEL_IDS = [int(id.strip()) for id in DISCORD_CHANNEL_IDS.split(',') if id.strip()]
-except ValueError as e:
-    raise ValueError("DISCORD_CHANNEL_IDS must be a comma-separated list of integers.") from e
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,27 +16,33 @@ class MyClient(discord.Client):
         logging.info(f'Logged in as {self.user}')
 
     async def on_message(self, message):
-        if message.channel.id in CHANNEL_IDS:
-            logging.info(f'Received message: {message.content}')
-            await self.process_message_content(message.content)
+        if message.channel.id == DISCORD_TWEET_CHANNEL_ID:
+            logging.info(f'Received tweet message: {message.content}')
+            await self.process_tweet_content(message.content)
+        elif message.channel.id == DISCORD_THREAD_CHANNEL_ID:
+            logging.info(f'Received thread message: {message.content}')
+            await self.process_thread_content(message.content)
 
-    async def process_message_content(self, message_content):
+    async def process_tweet_content(self, message_content):
         try:
             tweet_versions = generate_tweet_variations(message_content)
-
-            # Create the list of tweets starting with the original message content
             tweets = [message_content] + tweet_versions
-
-            # Call create_typefully_draft with the updated tweets list
             draft = create_typefully_draft(tweets)
-
-            logging.info(f"Generated draft: {draft}")
+            logging.info(f"Generated tweet draft: {draft}")
         except Exception as e:
-            logging.error(f"Error processing message content: {message_content}", exc_info=True)
+            logging.error(f"Error processing tweet content: {message_content}", exc_info=True)
+
+    async def process_thread_content(self, message_content):
+        try:
+            thread = generate_thread(message_content)
+            draft = create_typefully_draft(thread)
+            logging.info(f"Generated thread draft: {draft}")
+        except Exception as e:
+            logging.error(f"Error processing thread content: {message_content}", exc_info=True)
 
 intents = discord.Intents.default()
-intents.message_content = True  # Make sure this intent is enabled in the developer portal
+intents.message_content = True
 client = MyClient(intents=intents)
 
 if __name__ == '__main__':
-    client.run(DISCORD_BOT_TOKEN)
+    client.run(os.getenv('DISCORD_BOT_TOKEN'))
