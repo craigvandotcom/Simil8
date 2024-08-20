@@ -7,25 +7,25 @@ import time
 from datetime import datetime
 
 # third-party imports
-import aiohttp
-import requests
 import schedule
-from aiohttp import ClientSession
+from flask import Flask
 
 # local imports
-from config import IS_PRODUCTION
+from config import IS_PRODUCTION, frequent_task_interval
 from discord_bot import client as discord_client
 from readwise_processor import process_highlights
 from tweet_generator import create_highlight_thread
 from typefully_api import create_typefully_draft
-from web_server import start_server
-
-# Environment
-print(f"REPLIT_DEPLOYMENT (raw): {os.getenv('REPLIT_DEPLOYMENT')}")
-print(f"IS_PRODUCTION: {IS_PRODUCTION}")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Flask app initialization
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return 'Health check passed', 200
 
 async def run_frequent_task():
     logging.info(f"Running frequent task at {datetime.now()}")
@@ -49,24 +49,29 @@ async def run_frequent_task():
             results.append(result)
 
         logging.info(f"Task completed. Results: {results}")
+        return results
     except Exception as e:
         logging.error(f"Error in frequent task: {str(e)}", exc_info=True)
+        raise
 
 def run_discord_bot():
     discord_client.run(os.getenv('DISCORD_BOT_TOKEN'))
 
 if __name__ == "__main__":
-    print(f"IS_PRODUCTION (final): {IS_PRODUCTION}")
+    print(f"IS_PRODUCTION: {IS_PRODUCTION}")
 
     if IS_PRODUCTION:
         logging.info("Running in production mode")
-        server_thread = threading.Thread(target=start_server)
-        server_thread.start()
 
+        # Start Discord bot in a separate thread
         discord_thread = threading.Thread(target=run_discord_bot)
         discord_thread.start()
 
-        time.sleep(5)  # Wait for the servers to start
+        # Start Flask server in a separate thread
+        flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=80))
+        flask_thread.start()
+
+        time.sleep(5)  # Wait for the Discord bot to start
         logging.info("Scheduling the frequent task")
         schedule.every(frequent_task_interval).minutes.do(lambda: asyncio.run(run_frequent_task()))
         try:
@@ -77,13 +82,12 @@ if __name__ == "__main__":
             logging.info("Shutting down...")
     else:
         logging.info("Running in development mode")
-        server_thread = threading.Thread(target=start_server)
-        server_thread.start()
 
+        # Start Discord bot in a separate thread
         discord_thread = threading.Thread(target=run_discord_bot)
         discord_thread.start()
 
-        time.sleep(5)  # Wait for the servers to start
+        time.sleep(5)  # Wait for the Discord bot to start
         logging.info("Running task once for testing")
         asyncio.run(run_frequent_task())  # Run once for testing
         try:

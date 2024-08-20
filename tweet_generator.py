@@ -1,7 +1,10 @@
+# tweet_generator.py
+
+import json
+import re
+from typing import List, Dict, Any
 from openai import OpenAI
-from typing import List
 from config import OPENAI_API_KEY
-from typing import Dict, Any, List
 
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -12,22 +15,23 @@ def generate_tweet_variations(text: str, num_variations: int = 3) -> List[str]:
     Text: "{text}"
 
     Instructions:
-    - Create {num_variations} tweet versions, each expanding on the ideas in the given text, offering additional context, or relating it to broader concepts.
-    - Craft each tweet with the intention of capturing attention and going viral, while educating, providing value, or inspiring action.
+    - Create exactly {num_variations} tweet versions, each expanding on the ideas in the given text, offering additional context, or relating it to broader concepts.
+    - Craft each tweet to capture attention and go viral while educating, providing value, or inspiring action.
     - Keep each tweet within the 280-character limit.
-    - Include 1-2 relevant hashtags per tweet to increase discoverability.
+    - Include 1 relevant hashtag per tweet to increase discoverability.
     - Incorporate engaging elements such as questions, statistics, or thought-provoking statements.
-    - Maintain a consistent tone across all tweets that aligns with the target audience (e.g., professional, casual, humorous).
+    - Maintain a consistent tone across all tweets that align with the target audience (professional).
     - The ultimate goal is to add maximum value, educate, and inspire.
 
-    Format:
-    1. [Tweet content]
-    2. [Tweet content]
-    3. [Tweet content]
+    Output Format:
+    Provide the tweets as a valid JSON array of strings, like this:
+    ["Tweet 1 content", "Tweet 2 content", "Tweet 3 content"]
+
+    Ensure that each tweet is a complete, self-contained string within the array.
     """
 
     response = openai_client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an expert in marketing, copywriting, and social media. Your specific area of expertise is X (Twitter). Your job is to transform input text into high-performing tweet variations."},
             {"role": "user", "content": prompt}
@@ -35,9 +39,31 @@ def generate_tweet_variations(text: str, num_variations: int = 3) -> List[str]:
         max_tokens=800
     )
 
-    # Parse the response to extract only the tweet content
-    variations = response.choices[0].message.content.strip().split("\n")
-    return [variation.split(". ", 1)[1].strip() for variation in variations if variation.strip()]
+    content = response.choices[0].message.content.strip()
+
+    # Try to parse as JSON
+    try:
+        tweet_list = json.loads(content)
+        if isinstance(tweet_list, list) and len(tweet_list) == num_variations:
+            return tweet_list
+    except json.JSONDecodeError:
+        pass
+
+    # If JSON parsing fails, try to extract tweets using regex
+    tweet_pattern = re.compile(r'"([^"]+)"')
+    tweet_list = tweet_pattern.findall(content)
+
+    # If we still don't have the correct number of tweets, fall back to splitting by newlines
+    if len(tweet_list) != num_variations:
+        tweet_list = [line.strip().strip('"') for line in content.split('\n') if line.strip()]
+
+    # Ensure we have the correct number of variations
+    tweet_list = tweet_list[:num_variations]
+
+    # Ensure each tweet is within the character limit
+    tweet_list = [tweet[:280] for tweet in tweet_list]
+
+    return tweet_list
 
 def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
     prompt = f"""
@@ -60,19 +86,19 @@ def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
     4. Include 1-2 relevant hashtags in strategic places throughout the thread (not every tweet).
     5. Incorporate engaging elements such as questions, statistics, analogies, or thought-provoking statements.
     6. Maintain a consistent tone across all tweets that aligns with the target audience (e.g., professional, casual, humorous).
-    7. Use numbering (1/X) at the start of each tweet to help readers follow the thread.
+    7. Use numbering (1/{num_tweets}, 2/{num_tweets}, etc.) at the start of each tweet to help readers follow the thread.
     8. Ensure smooth transitions between tweets for a coherent reading experience.
     9. The ultimate goal is to add maximum value, educate, and inspire.
 
-    Format:
-    Tweet 1: [Hook tweet content]
-    Tweet 2: [Tweet content]
-    [Continue for the specified number of tweets]
-    Tweet X: [Conclusion tweet content]
+    Output Format:
+    Provide the tweets as a valid JSON array of strings, like this:
+    ["1/{num_tweets} Tweet 1 content", "2/{num_tweets} Tweet 2 content", "3/{num_tweets} Tweet 3 content", ..., "{num_tweets}/{num_tweets} Tweet {num_tweets} content"]
+
+    Ensure that each tweet is a complete, self-contained string within the array, including the numbering.
     """
 
     response = openai_client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an expert in marketing, copywriting, and social media. Your specific area of expertise is X (Twitter). Your job is to transform input text into high-performing thread variations."},
             {"role": "user", "content": prompt}
@@ -80,11 +106,38 @@ def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
         max_tokens=1500
     )
 
-    # Parse the response to extract only the tweet content
-    tweets = response.choices[0].message.content.strip().split("\n")
-    return [tweet.split(": ", 1)[1].strip() for tweet in tweets if tweet.strip() and ": " in tweet]
+    content = response.choices[0].message.content.strip()
+
+    # Try to parse as JSON
+    try:
+        tweet_list = json.loads(content)
+        if isinstance(tweet_list, list) and len(tweet_list) == num_tweets:
+            return tweet_list
+    except json.JSONDecodeError:
+        pass
+
+    # If JSON parsing fails, try to extract tweets using regex
+    tweet_pattern = re.compile(r'"([^"]+)"')
+    tweet_list = tweet_pattern.findall(content)
+
+    # If we still don't have the correct number of tweets, fall back to splitting by newlines
+    if len(tweet_list) != num_tweets:
+        tweet_list = [line.strip().strip('"') for line in content.split('\n') if line.strip()]
+
+    # Ensure we have the correct number of tweets
+    tweet_list = tweet_list[:num_tweets]
+
+    # Add numbering if it's not already present
+    for i, tweet in enumerate(tweet_list):
+        if not tweet.startswith(f"{i+1}/{num_tweets}"):
+            tweet_list[i] = f"{i+1}/{num_tweets} {tweet}"
+
+    # Ensure each tweet is within the character limit
+    tweet_list = [tweet[:280] for tweet in tweet_list]
+
+    return tweet_list
 
 def create_highlight_thread(highlight: Dict[str, Any]) -> List[str]:
-    original_tweet = f"\"{highlight['text']}\"\n🖋️ {highlight['book_author']}\n📚 {highlight['book_title']}"
-    variations = generate_tweet_variations(highlight['text'])
-    return [original_tweet] + variations
+    original_tweet = f"1/7 📚 {highlight['book_title']}\n\nOriginal highlight: \"{highlight['text']}\"\n\n🖋️ {highlight['book_author']}\n🔗 {highlight['readwise_url']}"
+    thread = generate_thread(highlight['text'], num_tweets=6)  # Generate 6 additional tweets
+    return [original_tweet] + thread

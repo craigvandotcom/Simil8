@@ -41,7 +41,6 @@ The generated content can then be posted to social media using Typefully.
     READWISE_TOKEN=your_readwise_token
     TYPEFULLY_API_KEY=your_typefully_api_key
     OPENAI_API_KEY=your_openai_api_key
-    TWEET_API_ENDPOINT=http://localhost:8080/generate-tweets  # Update if necessary
     ```
 
 3. **Install Dependencies**:

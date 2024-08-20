@@ -1,3 +1,4 @@
+# existing imports
 import discord
 import os
 import logging
@@ -36,7 +37,13 @@ class MyClient(discord.Client):
     async def process_message_content(self, message_content):
         try:
             tweet_versions = generate_tweet_variations(message_content)
-            draft = create_typefully_draft(tweet_versions)
+
+            # Create the list of tweets starting with the original message content
+            tweets = [message_content] + tweet_versions
+
+            # Call create_typefully_draft with the updated tweets list
+            draft = create_typefully_draft(tweets)
+
             logging.info(f"Generated draft: {draft}")
         except Exception as e:
             logging.error(f"Error processing message content: {message_content}", exc_info=True)

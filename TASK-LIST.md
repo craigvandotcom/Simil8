@@ -2,8 +2,8 @@ V00
 - [x] 15min task to fetch highlights and create tweets
 
 URGENT:
-- [ ] !!! readwise fetch not happenin
-- [ ] fetch from last highlight timestamp to correct for gaps
+- [x] !!! readwise fetch not happenin
+- [x] fetch from last highlight timestamp to correct for gaps
 - [ ] two threads bein made for each discord-tweet flow
   - [ ] setup configuration optionality: # tweets / # threads, original tweet on/off
 

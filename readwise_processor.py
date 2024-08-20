@@ -1,4 +1,5 @@
 import logging
+from config import frequent_task_interval
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
