@@ -6,14 +6,21 @@ URGENT:
 - [x] fetch from last highlight timestamp to correct for gaps
 - [x] two threads bein made for each discord-tweet flow
 
-V01: personal posts
+### V01: personal posts
 - [x] Discord text to tweet flow
   - [x] preserve original text in first tweet
-- [ ] Discord text to thread flow
+  - [ ] double thread being created, one with original text, one without - delete the one without
+      - [ ] idea2tweet
+      - [ ] 
+  - [ ] readwise highlight being transformed into thread instead of tweet
+- [x] Discord text to thread flow
+
+### Polishing:
 - [ ] setup configuration optionality: # tweets / # threads
 - [ ] improve tweet prompt (same/better/best/different, problem/benefits/solution)
+  - [ ] mine from Dan, Matt & Justin
 
-
+### Step Back
 - [ ] plan project overview w. AI: describe goal and journey - ask how to approach with sound python software engineering practices
 - [ ] figure out versioning
 

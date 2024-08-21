@@ -16,12 +16,12 @@ def generate_tweet_variations(text: str, num_variations: int = 3) -> List[str]:
 
     Instructions:
     - Create exactly {num_variations} tweet versions, each expanding on the ideas in the given text, offering additional context, or relating it to broader concepts.
-    - Craft each tweet to capture attention and go viral while educating, providing value, or inspiring action.
+    - Craft each tweet to add value, by educating or inspiring action.
     - Keep each tweet within the 280-character limit.
-    - Include 1 relevant hashtag per tweet to increase discoverability.
     - Incorporate engaging elements such as questions, statistics, or thought-provoking statements.
     - Maintain a consistent tone across all tweets that align with the target audience (professional).
     - The ultimate goal is to add maximum value, educate, and inspire.
+    - DO NOT include any hashtags.
 
     Output Format:
     Provide the tweets as a valid JSON array of strings, like this:
@@ -83,12 +83,12 @@ def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
     1. Create a thread of {num_tweets} tweets that expand on the ideas in the given text, offering additional context, insights, or relating it to broader concepts.
     2. Keep each tweet within the 280-character limit.
     3. Use the thread structure outlined above, adapting as needed for the specific content and tweet count.
-    4. Include 1-2 relevant hashtags in strategic places throughout the thread (not every tweet).
-    5. Incorporate engaging elements such as questions, statistics, analogies, or thought-provoking statements.
-    6. Maintain a consistent tone across all tweets that aligns with the target audience (e.g., professional, casual, humorous).
-    7. Use numbering (1/{num_tweets}, 2/{num_tweets}, etc.) at the start of each tweet to help readers follow the thread.
-    8. Ensure smooth transitions between tweets for a coherent reading experience.
-    9. The ultimate goal is to add maximum value, educate, and inspire.
+    4. Incorporate engaging elements such as questions, statistics, analogies, or thought-provoking statements.
+    5. Maintain a consistent tone across all tweets that aligns with the target audience (professional).
+    6. Use numbering (1/{num_tweets}, 2/{num_tweets}, etc.) at the start of each tweet to help readers follow the thread.
+    7. Ensure smooth transitions between tweets for a coherent reading experience.
+    8. The ultimate goal is to add maximum value, by educating and/or inspiring action.
+    9. DO NOT include any hashtags.
 
     Output Format:
     Provide the tweets as a valid JSON array of strings, like this:
@@ -137,7 +137,22 @@ def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
 
     return tweet_list
 
+
 def create_highlight_thread(highlight: Dict[str, Any]) -> List[str]:
-    original_tweet = f"1/7 📚 {highlight['book_title']}\n\nOriginal highlight: \"{highlight['text']}\"\n\n🖋️ {highlight['book_author']}\n🔗 {highlight['readwise_url']}"
-    thread = generate_thread(highlight['text'], num_tweets=6)  # Generate 6 additional tweets
+    """
+    Creates a thread of tweet variations from a book highlight.
+
+    Args:
+        highlight (Dict[str, Any]): A dictionary containing book highlight information.
+            - 'book_title': str, title of the book
+            - 'text': str, the original highlight text
+            - 'book_author': str, author of the book
+
+    Returns:
+        List[str]: A list of tweets forming a Twitter thread.
+            - First tweet: formatted original book highlight
+            - Subsequent tweets: variations of the original highlight
+    """
+    original_tweet = f"\"{highlight['text']}\"\n\n🖋️ {highlight['book_author']}\n📚 {highlight['book_title']}"
+    thread = generate_tweet_variations(highlight['text'], num_variations=3)  # Generate additional tweets
     return [original_tweet] + thread
