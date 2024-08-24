@@ -44,7 +44,8 @@ class MyClient(commands.Bot):
 
     async def process_thread_content(self, message_content):
         try:
-            thread = generate_thread(message_content)
+            thread_draft = generate_thread(message_content)
+            thread = [message_content] + thread_draft
             draft = create_typefully_draft(thread)
             logging.info(f"Generated thread draft: {draft}")
         except Exception as e:
