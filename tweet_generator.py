@@ -94,34 +94,52 @@ def generate_tweet_variations(text: str, num_variations: int = 6) -> List[str]:
 
 def generate_thread(text: str, num_tweets: int = 7) -> List[str]:
     prompt = f"""
-    Transform the following text into a coherent and engaging thread of {num_tweets} tweets:
+    Transform the following text into a coherent and engaging thread of {num_tweets} tweets using the Wisdom Implementation Framework (WIF):
 
-    Text: "{text}"
+Text: "{text}"
 
-    Thread Structure:
-    1. Hook (1 tweet): Capture attention with a surprising fact, question, or bold statement.
-    2. Context (1-2 tweets): Briefly explain the background or importance of the topic.
-    3. Main Points (varies): Present key ideas, insights, or arguments, one per tweet.
-    4. Supporting Details (varies): Provide examples, data, or elaboration for main points.
-    5. Addressing Counterarguments (optional, 1-2 tweets): Anticipate and address potential objections.
-    6. Conclusion (1 tweet): Summarize key takeaways or restate the main message.
+Thread Structure (Wisdom Implementation Framework):
+1. Wisdom Introduction (1-2 tweets)
+   - Present the core wisdom or insight from the given text
+   - Provide necessary context or background
 
-    Instructions:
-    1. Create a thread of {num_tweets} tweets that expand on the ideas in the given text, offering additional context, insights, or relating it to broader concepts.
-    2. Keep each tweet within the 280-character limit.
-    3. Use the thread structure outlined above, adapting as needed for the specific content and tweet count.
-    4. Incorporate engaging elements such as questions, statistics, analogies, or thought-provoking statements.
-    5. Maintain a consistent tone across all tweets that aligns with the target audience (professional).
-    6. Use numbering (1/{num_tweets}, 2/{num_tweets}, etc.) at the start of each tweet to help readers follow the thread.
-    7. Ensure smooth transitions between tweets for a coherent reading experience.
-    8. The ultimate goal is to add maximum value, by educating and/or inspiring action.
-    9. DO NOT include any hashtags.
+2. Risks of Inaction (1-2 tweets)
+   - Highlight key risks of not implementing this wisdom
+   - Use concrete examples or data where possible
 
-    Output Format:
-    Provide the tweets as a valid JSON array of strings, like this:
-    ["1/{num_tweets} Tweet 1 content", "2/{num_tweets} Tweet 2 content", "3/{num_tweets} Tweet 3 content", ..., "{num_tweets}/{num_tweets} Tweet {num_tweets} content"]
+3. Benefits of Implementation (2-3 tweets)
+   - Outline major benefits of applying this wisdom
+   - Include both short-term and long-term benefits
 
-    Ensure that each tweet is a complete, self-contained string within the array, including the numbering.
+4. Practical Steps (2-4 tweets)
+   - Present actionable steps to implement the wisdom
+   - Use a listicle format where suitable
+
+5. Inspiration for Action (1-2 tweets)
+   - Share a motivational quote or brief success story
+   - Paint a vivid picture of the positive outcome
+
+6. Call-to-Action (1 tweet)
+   - Encourage the reader to take the first step
+   - Provide a simple, immediate action they can take
+
+Instructions:
+1. Create a thread of {num_tweets} tweets that expand on the ideas in the given text, offering additional context, insights, or relating it to broader concepts.
+2. Keep each tweet within the 280-character limit.
+3. Use the Wisdom Implementation Framework outlined above, adapting the number of tweets per section as needed for the specific content and total tweet count.
+4. Incorporate engaging elements such as relevant statistics, analogies, or thought-provoking statements.
+5. Maintain a consistent, professional tone across all tweets.
+6. Use numbering (1/{num_tweets}, 2/{num_tweets}, etc.) at the start of each tweet to help readers follow the thread.
+7. Ensure smooth transitions between tweets and sections for a coherent reading experience.
+8. The ultimate goal is to add maximum value by educating and inspiring action based on the wisdom in the given text.
+9. DO NOT include any hashtags.
+10. Only ask questions that are intended to actually invite engagement, not rhetorical questions.
+11. If the given text doesn't perfectly fit the "wisdom" format, adapt the framework as needed while maintaining its core structure and purpose.
+
+Output Format:
+Provide the tweets as a valid JSON array of strings, like this:
+["1/{num_tweets} Tweet 1 content", "2/{num_tweets} Tweet 2 content", "3/{num_tweets} Tweet 3 content", ..., "{num_tweets}/{num_tweets} Tweet {num_tweets} content"]
+Ensure that each tweet is a complete, self-contained string within the array, including the numbering.
     """
 
     response = openai_client.chat.completions.create(
