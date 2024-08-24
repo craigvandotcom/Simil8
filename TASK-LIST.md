@@ -12,21 +12,15 @@
   - [x] podcast transcript missing, original text = "20sec Snip"
   - [x] readwise highlight being transformed into thread instead of tweet
 - [x] Discord text to thread flow
-- [ ] double thread being created, one through idea2tweet one through idea2thread - delete the thread
+- [x] double thread being created, one through idea2tweet one through idea2thread - delete the thread
 
 ### Polishing:
 - [ ] improve tweet prompt (same/better/best/different, problem/benefits/solution)
   - [ ] mine from Dan, Matt & Justin
-  - [ ] Prompt for tweet variations: 
-Original text
-Improved for tweet
-Inspirational
-Practical implementation
-Risks of not implementing
-Benefits of implementing
+  - [x] Prompt for tweet variations: Original text, Improved for tweet, Inspirational, Practical implementation, Risks of not implementing, Benefits of implementing
   - [ ] Prompt for threads: 
 Give second option of listicle, depending on the input
-- [ ] tweet remix flow - share tweet URL
+- [ ] tweet remix flow - share X tweet URL to discord, fetch tweet text, send to tweet variations flow
 - [ ] GPT 2 multi tweet draft
 
 ### Step Back

@@ -8,32 +8,59 @@ from config import OPENAI_API_KEY
 
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
-def generate_tweet_variations(text: str, num_variations: int = 3) -> List[str]:
+def generate_tweet_variations(text: str, num_variations: int = 6) -> List[str]:
     prompt = f"""
+    
     Transform the following text into {num_variations} diverse tweet versions:
 
     Text: "{text}"
-
+    
     Instructions:
     - Create exactly {num_variations} tweet versions, each expanding on the ideas in the given text, offering additional context, or relating it to broader concepts.
-    - Craft each tweet to add value, by educating or inspiring action.
+    - Craft each tweet to add value by educating or inspiring action.
     - Keep each tweet within the 280-character limit.
-    - Incorporate engaging elements such as questions, statistics, or thought-provoking statements.
+    - Authenticity resonates with audiences. Avoid overly promotional language; be genuine.
+    - Use active voice to make your tweets more dynamic and direct, increasing engagement.
+    - Personalize tweets (e.g., using "you" and "your") to make them more relatable and engaging.
+    - Incorporate engaging elements such as statistics or thought-provoking statements.
     - Maintain a consistent tone across all tweets that align with the target audience (professional).
-    - The ultimate goal is to add maximum value, educate, and inspire.
     - DO NOT include any hashtags.
-
+    - DO NOT ask rhetorical questions. Only ask questions that are intended to actually invite engagement.
+    
+    Specific goals for each tweet variation:
+    1. Very similar to the original text, but improved for tweeting
+    2. Best possible rephrasing for maximum engagement
+    3. If we regard the input text as wisdom, focus on the risks of not implementing this wisdom
+    4. If we regard the input text as wisdom, focus on the benefits of implementing this wisdom
+    5. If we regard the input text as wisdom, focus on the practical steps to implement this wisdom (use a listicle where suitable)
+    6. If we regard the input text as wisdom, focus on inspiring the reader to take action
+    
+    The ultimate goal is to add maximum value, educate, and inspire.
+    
     Output Format:
     Provide the tweets as a valid JSON array of strings, like this:
-    ["Tweet 1 content", "Tweet 2 content", "Tweet 3 content"]
-
+    ["Tweet 1 content", "Tweet 2 content", "Tweet 3 content", ...]
+    
     Ensure that each tweet is a complete, self-contained string within the array.
     """
 
     response = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You are an expert in marketing, copywriting, and social media. Your specific area of expertise is X (Twitter). Your job is to transform input text into high-performing tweet variations."},
+            {"role": "system", "content": 
+             """
+            You are an expert in digital marketing, copywriting, and social media strategy, with a specialized focus on Twitter. Your role is to transform input text into high-performing tweet variations that resonate with a professional audience, maximize engagement, add value, and inspire action. You possess:
+            
+            Deep understanding of Twitter's unique ecosystem, user behavior, and platform dynamics
+            Mastery of concise, impactful writing within the 280-character limit
+            Ability to craft engaging content that educates, inspires, and drives action
+            Skill in adapting content to various professional contexts and industries
+            Knowledge of current social media trends and best practices
+            Expertise in creating content that encourages genuine engagement and discussion
+            
+            Your task is to skillfully use this expertise to generate tweet variations that are authentic, valuable, and tailored to the specific goals outlined in the instructions. Each variation should be optimized for Twitter's unique platform, leveraging your understanding to create diverse and impactful tweets.
+            """
+            },
             {"role": "user", "content": prompt}
         ],
         max_tokens=800
