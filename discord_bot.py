@@ -30,6 +30,8 @@ class MyClient(commands.Bot):
         elif message.channel.id == int(DISCORD_THREAD_CHANNEL_ID):
             logging.info(f'Received thread message: {message.content}')
             await self.process_thread_content(message.content)
+        else:
+            logging.info(f'Received message in unhandled channel: {message.channel.id}')
 
     async def process_tweet_content(self, message_content):
         try:
