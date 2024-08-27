@@ -14,6 +14,12 @@ anthropic_client = Anthropic(api_key=Config.ANTHROPIC_API_KEY)
 def generate_content(text: str, prompt_key: str, model: str = 'gpt-4', num_variations: int = 6) -> List[str]:
     prompt = load_prompt(prompt_key).format(text=text, num_variations=num_variations)
 
+    logging.info(f"Generated prompt for key '{prompt_key}': {prompt[:100]}...")  # Log first 100 characters of the prompt
+
+    if not prompt.strip():
+        logging.error(f"Empty prompt generated for key: {prompt_key}")
+        return []  # Return an empty list instead of raising an error
+
     if model.startswith('gpt'):
         return _generate_openai(prompt, model, num_variations)
     elif model.startswith('claude'):
@@ -34,6 +40,10 @@ def _generate_openai(prompt: str, model: str, num_variations: int) -> List[str]:
 
 def _generate_anthropic(prompt: str, model: str, num_variations: int) -> List[str]:
     try:
+        # Check if prompt is empty
+        if not prompt.strip():
+            raise ValueError("Prompt cannot be empty")
+
         response = anthropic_client.messages.create(
             model=model,
             max_tokens=1000,
@@ -79,18 +89,22 @@ def _parse_response(content: str, num_variations: int) -> List[str]:
 def to_tweet_variations(text: str, highlight: Dict[str, Any] = None) -> List[str]:
     if highlight:
         original_tweet = f"\"{highlight['text']}\"\n\n🖋️ {highlight['book_author']}\n📚 {highlight['book_title']}"
-        prompt_key = 'tweet_thread'
+        prompt_key = Config.THREAD_PROMPT_TYPE
         num_variations = 3  # Fixed number for tweet thread
     else:
-        prompt_key = 'tweet_variations'
+        prompt_key = Config.TWEET_VARIATIONS_PROMPT_TYPE
         num_variations = Config.TWEET_VARIATIONS_COUNT
     
+    logging.info(f"Generating tweet variations with prompt_key: {prompt_key}, num_variations: {num_variations}")
     variations = generate_content(text, prompt_key, Config.AI_MODEL, num_variations)
-    
+    logging.info(f"Generated variations: {variations}")
     if highlight:
-        return [original_tweet] + variations
-    return variations
+        result = [original_tweet] + variations
+    else:
+        result = variations
+    logging.info(f"Final result: {result}")
+    return result
 
 def to_thread(text: str) -> List[str]:
-    thread = generate_content(text, 'thread', Config.AI_MODEL, Config.MAX_THREAD_TWEETS)
+    thread = generate_content(text, Config.THREAD_PROMPT_TYPE, Config.AI_MODEL, Config.MAX_THREAD_TWEETS)
     return [f"{i+1}/{Config.MAX_THREAD_TWEETS} {tweet.lstrip(f'{i+1}/{Config.MAX_THREAD_TWEETS}').strip()}" for i, tweet in enumerate(thread)]

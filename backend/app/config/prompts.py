@@ -47,7 +47,27 @@ Provide the tweets as a valid JSON array of strings, like this:
 Ensure that each tweet is a complete, self-contained string within the array.
 """
 
-THREAD = """
+BASIC_THREAD = """
+Transform the following text into a coherent thread of {num_variations} tweets:
+
+Text: "{text}"
+
+Instructions:
+1. Create a thread of {num_variations} tweets that expand on the ideas in the given text.
+2. Each tweet should be self-contained but also flow well as part of the thread.
+3. Keep each tweet within the 280-character limit.
+4. Maintain a consistent, professional tone across all tweets.
+5. Use numbering (1/{num_variations}, 2/{num_variations}, etc.) at the start of each tweet.
+6. The first tweet should introduce the main idea, and subsequent tweets should elaborate.
+7. The second-last tweet should cover a TL;DR of the main idea.
+8. The final tweet should conclude and summarise the thread.
+
+Output Format:
+Provide the tweets as a valid JSON array of strings, like this:
+["1/{num_variations} Tweet 1 content", "2/{num_variations} Tweet 2 content", "3/{num_variations} Tweet 3 content"]
+"""
+
+WIF_THREAD = """
 Transform the following text into a coherent and engaging thread of {num_variations} tweets using the Wisdom Implementation Framework (WIF):
 
 Text: "{text}"

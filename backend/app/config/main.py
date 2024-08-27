@@ -23,9 +23,10 @@ class Config:
 
     # Load prompts from the prompts.py file
     PROMPTS = {
-        "system_prompt": prompts.SYSTEM_PROMPT,
-        "tweet_variations": prompts.TWEET_VARIATIONS,
-        "thread": prompts.THREAD
+        SYSTEM_PROMPT_KEY: prompts.SYSTEM_PROMPT,
+        TWEET_VARIATIONS_PROMPT_KEY: prompts.TWEET_VARIATIONS,
+        BASIC_THREAD_PROMPT_KEY: prompts.BASIC_THREAD,
+        WIF_THREAD_PROMPT_KEY: prompts.WIF_THREAD
     }
 
     # User settings
@@ -36,6 +37,8 @@ class Config:
     ENABLE_DISCORD_BOT = ENABLE_DISCORD_BOT
     ENABLE_READWISE_INTEGRATION = ENABLE_READWISE_INTEGRATION
     ENABLE_TYPEFULLY_INTEGRATION = ENABLE_TYPEFULLY_INTEGRATION
+    THREAD_PROMPT_TYPE = THREAD_PROMPT_TYPE
+    TWEET_VARIATIONS_PROMPT_TYPE = TWEET_VARIATIONS_PROMPT_TYPE
 
     @staticmethod
     def check_environment_variables():
