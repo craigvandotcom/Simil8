@@ -5,6 +5,11 @@
 - [x] !!! readwise fetch not happenin
 - [x] fetch from last highlight timestamp to correct for gaps
 - [x] two threads bein made for each discord-tweet flow
+- [x] idea2thread bug
+- [ ] health status message, error message
+- [x] sonnet 3.5 (model selection)
+- [x] prompt refinement
+      - [x] meditation, philosophy, principles
 
 ### V0.01: personal posts
 - [x] Discord text to tweet flow

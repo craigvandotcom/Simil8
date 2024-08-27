@@ -1,11 +1,11 @@
 import logging
-from config import frequent_task_interval
+from ..config import Config
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
-
 import requests
-
-from config import IS_PRODUCTION, READWISE_TOKEN, frequent_task_interval
+import asyncio
+from .tweet_generator import to_tweet_variations
+from .typefully_api import create_typefully_draft
 
 def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, Any]]:
     full_data = []
@@ -20,7 +20,7 @@ def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, An
         response = requests.get(
             url="https://readwise.io/api/v2/export/",
             params=params,
-            headers={"Authorization": f"Token {READWISE_TOKEN}"},
+            headers={"Authorization": f"Token {Config.READWISE_TOKEN}"},
             verify=False  # Note: In production, you might want to verify SSL certificates
         )
         response.raise_for_status()
@@ -33,7 +33,7 @@ def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, An
 
 def process_highlights() -> List[Dict[str, Any]]:
     # Calculate the timestamp for 'frequent_task_interval' minutes ago
-    time_interval_ago = (datetime.utcnow() - timedelta(minutes=frequent_task_interval)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    time_interval_ago = (datetime.utcnow() - timedelta(minutes=Config.FREQUENT_TASK_INTERVAL)).strftime('%Y-%m-%dT%H:%M:%SZ')
     logging.info(f"Fetching highlights updated after: {time_interval_ago}")
 
     books_data = fetch_from_export_api(updated_after=time_interval_ago)
@@ -60,3 +60,33 @@ def process_highlights() -> List[Dict[str, Any]]:
 
     logging.info(f"Processed {len(processed_highlights)} highlights from {len(books_data)} books")
     return processed_highlights
+
+async def run_frequent_task():
+    while True:
+        logging.info(f"Running frequent task at {datetime.now()}")
+        try:
+            if Config.ENABLE_READWISE_INTEGRATION:
+                highlights = process_highlights()
+                results = []
+
+                for highlight in highlights:
+                    thread = to_tweet_variations(highlight['text'], highlight=highlight)
+                    logging.info(f"Generated thread for highlight {highlight['id']}: {thread}")
+
+                    if Config.ENABLE_TYPEFULLY_INTEGRATION:
+                        response = create_typefully_draft(thread)
+                        result = {
+                            "status": "success",
+                            "highlight_id": highlight['id'],
+                            "draft_id": response.get("id"),
+                            "share_url": response.get("share_url"),
+                            "tweet_count": len(thread)
+                        }
+                        results.append(result)
+
+                logging.info(f"Task completed. Results: {results}")
+        except Exception as e:
+            logging.error(f"Error in frequent task: {str(e)}", exc_info=True)
+
+        # Wait for the specified interval before running again
+        await asyncio.sleep(Config.READWISE_TASK_FREQUENCY * 60)  # Convert minutes to seconds

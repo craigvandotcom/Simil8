@@ -13,6 +13,8 @@ urllib3 = "^2.2.2"
 flask = "^3.0.3"
 aiohttp = "^3.10.3"
 discord-py = "^2.4.0"
+tweet-generator = "^0.0.31"
+flask-cors = "^3.0.10"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

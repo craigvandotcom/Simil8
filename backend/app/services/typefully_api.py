@@ -2,14 +2,14 @@ import json
 import urllib3
 import logging
 from typing import List, Dict, Any
-from config import TYPEFULLY_API_KEY
+from ..config import Config
 
 http = urllib3.PoolManager()
 
 def create_typefully_draft(tweets: List[str]) -> Dict[str, Any]:
     url = "https://api.typefully.com/v1/drafts"
     headers = {
-        "X-API-KEY": TYPEFULLY_API_KEY,
+        "X-API-KEY": Config.TYPEFULLY_API_KEY,
         "Content-Type": "application/json"
     }
     content = "\n\n\n\n".join(tweets)
