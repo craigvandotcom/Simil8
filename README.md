@@ -1,9 +1,10 @@
 # Multi-Input to Tweet Bot
+
 ## Overview
 This project is an advanced social media automation tool that integrates various input sources to generate tweets and threads. It currently supports:
 - Monitoring specified Discord channels for new messages
 - Fetching highlights from Readwise
-- Generating tweet variations and threads using OpenAI's GPT model
+- Generating tweet variations and threads using OpenAI's GPT model or Anthropic's Claude model
 - Posting content to social media using Typefully
 
 ## Features
@@ -14,6 +15,7 @@ This project is an advanced social media automation tool that integrates various
 - Periodic task execution: Process highlights and create tweet threads at regular intervals
 - Logging: Comprehensive logging of message processing and API requests
 - Web server: Flask-based web server for health checks and manual task triggering
+- Environment-based configuration: Different settings for development and production
 
 ## Prerequisites
 - Python 3.10+
@@ -21,6 +23,7 @@ This project is an advanced social media automation tool that integrates various
 - Readwise account
 - Typefully account
 - OpenAI account
+- Anthropic account
 - Docker (optional, for containerized deployment)
 
 ## Installation
@@ -39,9 +42,13 @@ This project is an advanced social media automation tool that integrates various
    READWISE_TOKEN=your_readwise_token
    TYPEFULLY_API_KEY=your_typefully_api_key
    OPENAI_API_KEY=your_openai_api_key
-   REPLIT_DEPLOYMENT=true
+   ANTHROPIC_API_KEY=your_anthropic_api_key
+   DISCORD_ERROR_CHANNEL_ID=123456789
+   DISCORD_HEALTH_CHECK_CHANNEL_ID=987654321
+   REPLIT_DEPLOYMENT=false
    ```
-4. Install dependencies:
+
+3. Install dependencies:
    Using Poetry (recommended):
    ```bash
    poetry install
@@ -61,6 +68,7 @@ Or, using Poetry:
    ```bash
    poetry run python main.py
    ```
+
 ### Production Mode
 Set `REPLIT_DEPLOYMENT=true` in your `.env` file.
 Deploy the bot following Replit's deployment instructions.
@@ -76,8 +84,12 @@ Run the Docker container:
    ```
 
 ## Configuration
-Adjust the `frequent_task_interval` in `config.py` to change how often the bot processes highlights and creates tweets.
-Modify the tweet generation prompts in `prompts.json` to customize the output style and content.
+- Adjust settings in `backend/app/config/user_settings.py`:
+  - `READWISE_TASK_FREQUENCY`: Change how often the bot processes highlights and creates tweets
+  - `AI_MODEL`: Choose between 'gpt-4' or 'claude-3-5-sonnet-20240620'
+  - `TWEET_VARIATIONS_COUNT`: Set the number of tweet variations to generate
+  - `MAX_THREAD_TWEETS`: Set the maximum number of tweets in a thread
+- Modify the tweet generation prompts in `backend/app/config/prompts.py` to customize the output style and content
 
 ## API Endpoints
 The Flask web server provides the following endpoints:
@@ -86,6 +98,67 @@ The Flask web server provides the following endpoints:
 - `POST /generate-tweets`: Generate tweet variations from provided text
 - `POST /generate-threads`: Generate tweet threads from provided text
 - `POST /run-frequent-task`: Manually trigger the periodic task
+
+## Project Structure
+- `backend/`: Main application code
+  - `app/`: Core application modules
+    - `config/`: Configuration files
+    - `services/`: Service modules (Discord, Readwise, Typefully, etc.)
+  - `routes/`: API route definitions
+- `tests/`: Test files
+- `frontend/`: (If applicable) Frontend code
+
+## Testing
+This project uses pytest for testing. To run the tests, follow these steps:
+
+1. Ensure you have pytest and pytest-asyncio installed:
+   ```bash
+   poetry add pytest pytest-cov pytest-asyncio  # If using Poetry
+   pip install pytest pytest-cov pytest-asyncio  # If using pip
+   ```
+
+2. Run all tests:
+   ```bash
+   pytest
+   ```
+
+3. Run tests with coverage report:
+   ```bash
+   pytest --cov=backend
+   ```
+
+4. Run a specific test file:
+   ```bash
+   pytest tests/test_routes.py
+   ```
+
+5. Run a specific test function:
+   ```bash
+   pytest tests/test_routes.py::test_health_check
+   ```
+
+### Discord Bot Tests
+The project includes specific tests for the Discord bot functionality. These tests cover:
+
+- Processing tweet content
+- Processing thread content
+- Handling messages in different channels
+- Sending health status messages
+- Sending error messages
+
+To run the Discord bot tests specifically:
+```bash
+pytest tests/test_discord_bot.py
+```
+
+These tests use mocking to simulate Discord interactions and verify the bot's behavior without actually connecting to Discord servers.
+
+The test files are located in the `tests/` directory. You can add more test files or modify existing ones as needed.
+
+## Troubleshooting
+- If you encounter missing environment variables, check your `.env` file and ensure all required variables are set
+- For API-related issues, check the respective service documentation (Discord, Readwise, Typefully, OpenAI, Anthropic)
+- Review the application logs for detailed error messages and stack traces
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
@@ -103,4 +176,8 @@ This project is licensed under the MIT License. See the LICENSE file for details
 - Discord.py for Discord integration
 - Readwise for highlight retrieval
 - OpenAI for GPT-based text generation
+- Anthropic for Claude-based text generation
 - Typefully for tweet scheduling and posting
+
+## Contact
+For support or to report issues, please open an issue on the GitHub repository.

@@ -1,45 +1,47 @@
 import asyncio
-import logging
 from backend.app import create_app
 from backend.app.config import Config
 from backend.app.services.discord_bot import setup_and_run_bot, report_error_to_discord
 from backend.app.services.readwise_processor import run_frequent_task
+from backend.app.logger import get_logger
+from threading import Thread
+import os
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = get_logger(__name__)
 
 app = create_app()
 
+def run_flask():
+    """Run Flask application"""
+    app.run(host='0.0.0.0', port=int(Config.PORT), debug=not Config.IS_PRODUCTION)
+
 async def main():
-    logging.info("Starting main function...")
+    """
+    Main asynchronous function to run the application.
+    Sets up and runs the Discord bot, frequent tasks, and Flask server.
+    """
+    logger.info("Starting main function", extra={"action": "start_main"})
     tasks = [run_frequent_task()]
 
     if Config.ENABLE_DISCORD_BOT:
         tasks.append(setup_and_run_bot())
 
-    if Config.IS_PRODUCTION:
-        logging.info("Running in production mode")
-        # In production, run Flask in a separate thread
-        from threading import Thread
-        flask_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=int(Config.PORT)))
-        flask_thread.start()
-    else:
-        logging.info("Running in development mode")
-        # In development, run Flask as an asyncio task
-        tasks.append(app.run_task(host='0.0.0.0', port=int(Config.PORT)))
-
-    try:
-        await asyncio.gather(*tasks)
-    except Exception as e:
-        error_message = f"Error in main function: {str(e)}"
-        logging.error(error_message, exc_info=True)
+    # Run Flask in a separate process
+    if os.fork() == 0:  # Child process
+        run_flask()
+        os._exit(0)
+    else:  # Parent process
         try:
+            await asyncio.gather(*tasks)
+        except Exception as e:
+            error_message = f"Error in main function: {str(e)}"
+            logger.exception(error_message)
             await report_error_to_discord(error_message)
-        except Exception as discord_error:
-            logging.error(f"Failed to report error to Discord: {str(discord_error)}", exc_info=True)
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except Exception as e:
-        logging.error(f"Fatal error: {str(e)}", exc_info=True)
+        logger.exception(f"Fatal error: {str(e)}")
+        asyncio.run(report_error_to_discord(f"Fatal error: {str(e)}"))

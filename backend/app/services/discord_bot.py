@@ -4,12 +4,14 @@ import os
 import discord
 from discord.ext import commands, tasks
 from ..config import Config
-from .tweet_generator import to_tweet_variations, to_thread
-from .typefully_api import create_typefully_draft
 from datetime import datetime, time
+import asyncio
+import ssl
+import certifi
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -20,13 +22,12 @@ class MyClient(commands.Bot):
         self.health_check_started = False
 
     async def setup_hook(self):
-        # Start the task in the setup_hook method only if it hasn't been started yet
         if not self.health_check_started:
             self.daily_health_check.start()
             self.health_check_started = True
 
     async def on_ready(self):
-        logging.info(f'Logged in as {self.user}')
+        logger.info(f'Logged in as {self.user}')
         await self.send_startup_message()
 
     async def send_startup_message(self):
@@ -35,30 +36,35 @@ class MyClient(commands.Bot):
             try:
                 await channel.send("🚀 Bot has started up and is now operational!")
             except Exception as e:
-                logging.error(f"Failed to send startup message: {str(e)}", exc_info=True)
+                logger.exception(f"Failed to send startup message: {str(e)}")
         else:
-            logging.error("Could not find health check channel for startup message")
+            logger.error("Could not find health check channel for startup message")
 
     async def on_message(self, message):
-        logging.info(f'Received message in channel: {message.channel.id}')
-        if message.channel.id == int(Config.DISCORD_TWEET_CHANNEL_ID):
-            logging.info(f'Received tweet message: {message.content}')
-            await self.process_tweet_content(message.content)
-        elif message.channel.id == int(Config.DISCORD_THREAD_CHANNEL_ID):
-            logging.info(f'Received thread message: {message.content}')
-            await self.process_thread_content(message.content)
-        else:
-            logging.info(f'Received message in unhandled channel: {message.channel.id}')
+        logger.info(f'Received message in channel: {message.channel.id}')
+        try:
+            if message.channel.id == int(Config.DISCORD_TWEET_CHANNEL_ID):
+                logger.info(f'Received tweet message: {message.content}')
+                await self.process_tweet_content(message.content)
+            elif message.channel.id == int(Config.DISCORD_THREAD_CHANNEL_ID):
+                logger.info(f'Received thread message: {message.content}')
+                await self.process_thread_content(message.content)
+            else:
+                logger.info(f'Received message in unhandled channel: {message.channel.id}')
+        except Exception as e:
+            error_message = f"Error processing message: {str(e)}"
+            logger.exception(error_message)
+            await self.report_error(error_message)
 
     async def process_tweet_content(self, message_content):
         try:
             tweet_versions = to_tweet_variations(message_content)
             tweets = [message_content] + tweet_versions
             draft = create_typefully_draft(tweets)
-            logging.info(f"Generated tweet draft: {draft}")
+            logger.info(f"Generated tweet draft: {draft}")
         except Exception as e:
             error_message = f"Error processing tweet content: {message_content}\n{str(e)}"
-            logging.error(error_message, exc_info=True)
+            logger.exception(error_message)
             await self.report_error(error_message)
 
     async def process_thread_content(self, message_content):
@@ -66,9 +72,11 @@ class MyClient(commands.Bot):
             thread_draft = to_thread(message_content)
             thread = [message_content] + thread_draft
             draft = create_typefully_draft(thread)
-            logging.info(f"Generated thread draft: {draft}")
+            logger.info(f"Generated thread draft: {draft}")
         except Exception as e:
-            logging.error(f"Error processing thread content: {message_content}", exc_info=True)
+            error_message = f"Error processing thread content: {message_content}\n{str(e)}"
+            logger.exception(error_message)
+            await self.report_error(error_message)
 
     async def report_error(self, error_message):
         channel_id = Config.DISCORD_ERROR_CHANNEL_ID
@@ -77,9 +85,9 @@ class MyClient(commands.Bot):
             if channel:
                 await channel.send(f"⚠️ Error: {error_message}")
             else:
-                logging.error(f"Could not find error reporting channel (ID: {channel_id}). Error: {error_message}")
+                logger.error(f"Could not find error reporting channel (ID: {channel_id}). Error: {error_message}")
         except Exception as e:
-            logging.error(f"Failed to report error to Discord: {str(e)}\nOriginal error: {error_message}", exc_info=True)
+            logger.exception(f"Failed to report error to Discord: {str(e)}\nOriginal error: {error_message}")
 
     @tasks.loop(time=time(hour=6))  # Run daily at 6 AM
     async def daily_health_check(self):
@@ -89,9 +97,11 @@ class MyClient(commands.Bot):
                 # Perform health check (you may want to add more comprehensive checks)
                 await channel.send("✅ Daily health check passed. All systems operational.")
             except Exception as e:
-                await self.report_error(f"Daily health check failed: {str(e)}")
+                error_message = f"Daily health check failed: {str(e)}"
+                logger.exception(error_message)
+                await self.report_error(error_message)
         else:
-            logging.error("Could not find health check channel")
+            logger.error("Could not find health check channel")
 
 client = MyClient()
 
@@ -101,4 +111,9 @@ async def report_error_to_discord(error_message):
 
 # New function to setup and run the bot
 async def setup_and_run_bot():
-    await client.start(Config.DISCORD_BOT_TOKEN)
+    try:
+        await client.start(Config.DISCORD_BOT_TOKEN)
+    except Exception as e:
+        logger.exception(f"Failed to start Discord bot: {str(e)}")
+        # Since the bot failed to start, we can't use it to report the error
+        # You might want to implement an alternative error reporting mechanism here
