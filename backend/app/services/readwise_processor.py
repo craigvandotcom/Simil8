@@ -82,11 +82,11 @@ async def run_frequent_task():
                 results = []
 
                 for highlight in highlights:
-                    variations = to_tweet_variations(highlight['text'], highlight=highlight)
+                    variations = await to_tweet_variations(highlight['text'], highlight=highlight)
                     logger.info("Generated variations for highlight", extra={"highlight_id": highlight['id'], "variations": variations})
 
                     if Config.ENABLE_TYPEFULLY_INTEGRATION:
-                        response = create_typefully_draft(variations)
+                        response = await create_typefully_draft(variations)
                         result = {
                             "status": "success",
                             "highlight_id": highlight['id'],
@@ -99,7 +99,7 @@ async def run_frequent_task():
                 logger.info("Task completed", extra={"results": results})
         except Exception as e:
             error_message = f"Error in frequent task: {str(e)}"
-            logger.error(error_message, exc_info=True, extra={"error_message": str(e)})
+            logger.error(error_message, exc_info=True)
             await report_error_to_discord(error_message)
 
         # Wait for the specified interval before running again
