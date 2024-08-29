@@ -5,7 +5,7 @@ from ..services.tweet_generator import to_tweet_variations, to_thread
 from ..services.typefully_api import create_typefully_draft
 from ..logger import get_logger
 import asyncio
-from ..services.discord_bot import report_error_to_discord
+from ..services.error_reporting import report_error_to_discord
 
 logger = get_logger(__name__)
 

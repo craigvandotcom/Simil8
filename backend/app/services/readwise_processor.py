@@ -7,7 +7,7 @@ import asyncio
 from .tweet_generator import to_tweet_variations
 from .typefully_api import create_typefully_draft
 from ..logger import get_logger
-from ..services.discord_bot import report_error_to_discord
+from .error_reporting import report_error_to_discord  # Update this import
 
 logger = get_logger(__name__)
 
@@ -47,42 +47,36 @@ def fetch_from_export_api(updated_after: str | None = None) -> List[Dict[str, An
 def process_highlights() -> List[Dict[str, Any]]:
     # Calculate the timestamp for 'READWISE_TASK_FREQUENCY' minutes ago
     time_interval_ago = (datetime.utcnow() - timedelta(minutes=Config.READWISE_TASK_FREQUENCY)).strftime('%Y-%m-%dT%H:%M:%SZ')
-    logger.info("Fetching highlights updated after", extra={"timestamp": time_interval_ago})
-
-    books_data = fetch_from_export_api(updated_after=time_interval_ago)
-    logger.info("Fetched books from Readwise", extra={"book_count": len(books_data)})
-
-    processed_highlights = []
-    for book in books_data:
-        book_title = book.get('title', 'Unknown Title')
-        book_author = book.get('author', 'Unknown Author')
-        book_id = book.get('user_book_id')
-        for highlight in book.get('highlights', []):
-            processed_highlights.append({
-                'id': highlight.get('id'),
-                'text': highlight.get('text', ''),
-                'readwise_url': highlight.get('readwise_url', ''),
-                'book_id': book_id,
-                'book_title': book_title,
-                'book_author': book_author,
-                'highlighted_at': highlight.get('highlighted_at'),
-                'color': highlight.get('color'),
-                'note': highlight.get('note'),
-                'tags': highlight.get('tags', [])
-            })
-
-    logger.info("Processed highlights from books", extra={"highlight_count": len(processed_highlights), "book_count": len(books_data)})
-    return processed_highlights
+    logger.info("Fetching highlights updated after", extra={"time": time_interval_ago})
+    
+    try:
+        data = fetch_from_export_api(updated_after=time_interval_ago)
+        processed_highlights = []
+        
+        for book in data:
+            for highlight in book['highlights']:
+                processed_highlight = {
+                    'id': highlight['id'],
+                    'text': highlight['text'],
+                    'book_title': book['title'],
+                    'book_author': book['author'],
+                    'source': book['source'],
+                    'category': book['category']
+                }
+                processed_highlights.append(processed_highlight)
+        
+        logger.info("Processed highlights", extra={"count": len(processed_highlights)})
+        return processed_highlights
+    except Exception as e:
+        error_message = f"Error processing highlights: {str(e)}"
+        logger.error(error_message, exc_info=True)
+        asyncio.create_task(report_error_to_discord(error_message))
+        return []
 
 async def run_frequent_task():
-    """
-    Runs the frequent task to process highlights and generate tweets.
-    This function runs indefinitely, sleeping for the configured interval between runs.
-    """
     while True:
-        current_time = datetime.now().isoformat()  # Convert datetime to ISO format string
-        logger.info("Running frequent task", extra={"timestamp": current_time})
         try:
+            logger.info("Starting frequent task")
             if Config.ENABLE_READWISE_INTEGRATION:
                 highlights = process_highlights()
                 results = []

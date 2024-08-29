@@ -8,6 +8,8 @@ from datetime import datetime, time
 import asyncio
 import ssl
 import certifi
+from .tweet_generator import to_tweet_variations, to_thread  # Add to_thread here
+from .typefully_api import create_typefully_draft  # Add this import if not already present
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -58,20 +60,25 @@ class MyClient(commands.Bot):
 
     async def process_tweet_content(self, message_content):
         try:
-            tweet_versions = to_tweet_variations(message_content)
+            logger.info(f"Starting to process tweet content: {message_content}")
+            logger.info("Calling to_tweet_variations")
+            tweet_versions = await to_tweet_variations(message_content)
+            logger.info(f"Received tweet versions: {tweet_versions}")
             tweets = [message_content] + tweet_versions
-            draft = create_typefully_draft(tweets)
+            logger.info(f"Combined tweets: {tweets}")
+            logger.info("Calling create_typefully_draft")
+            draft = await create_typefully_draft(tweets)
             logger.info(f"Generated tweet draft: {draft}")
         except Exception as e:
             error_message = f"Error processing tweet content: {message_content}\n{str(e)}"
-            logger.exception(error_message)
+            logger.error(error_message)
             await self.report_error(error_message)
 
     async def process_thread_content(self, message_content):
         try:
-            thread_draft = to_thread(message_content)
+            thread_draft = await to_thread(message_content)
             thread = [message_content] + thread_draft
-            draft = create_typefully_draft(thread)
+            draft = await create_typefully_draft(thread)
             logger.info(f"Generated thread draft: {draft}")
         except Exception as e:
             error_message = f"Error processing thread content: {message_content}\n{str(e)}"
@@ -103,17 +110,39 @@ class MyClient(commands.Bot):
         else:
             logger.error("Could not find health check channel")
 
-client = MyClient()
+# Add this import
+from .error_reporting import set_error_reporter
 
-# Function to be called from other parts of the application
-async def report_error_to_discord(error_message):
-    await client.report_error(error_message)
+# Replace the existing report_error_to_discord function with this:
+async def report_error_to_discord(error_message: str, bot: MyClient = None):
+    channel_id = Config.DISCORD_ERROR_CHANNEL_ID
+    try:
+        if bot:
+            channel = bot.get_channel(int(channel_id))
+        else:
+            logger.error("Bot instance not available for error reporting")
+            return
+        if channel:
+            await channel.send(f"⚠️ Error: {error_message}")
+        else:
+            logger.error(f"Could not find error reporting channel (ID: {channel_id}). Error: {error_message}")
+    except Exception as e:
+        logger.exception(f"Failed to report error to Discord: {str(e)}\nOriginal error: {error_message}")
 
-# New function to setup and run the bot
+# Modify the setup_and_run_bot function:
 async def setup_and_run_bot():
     try:
-        await client.start(Config.DISCORD_BOT_TOKEN)
+        bot = MyClient()
+        set_error_reporter(lambda msg: report_error_to_discord(msg, bot))
+        await bot.start(Config.DISCORD_BOT_TOKEN)
     except Exception as e:
-        logger.exception(f"Failed to start Discord bot: {str(e)}")
-        # Since the bot failed to start, we can't use it to report the error
-        # You might want to implement an alternative error reporting mechanism here
+        error_message = f"Failed to start Discord bot: {str(e)}"
+        logger.exception(error_message)
+        # We can't use report_error_to_discord here because the bot isn't started
+        logger.error(f"Bot startup error: {error_message}")
+
+# Remove this line as it's no longer needed
+# set_error_reporter(report_error_to_discord)
+
+# Add this at the end of the file to make setup_and_run_bot available for import
+__all__ = ['setup_and_run_bot']

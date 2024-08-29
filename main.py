@@ -1,7 +1,8 @@
 import asyncio
 from backend.app import create_app
 from backend.app.config import Config
-from backend.app.services.discord_bot import setup_and_run_bot, report_error_to_discord
+from backend.app.services.discord_bot import setup_and_run_bot
+from backend.app.services.error_reporting import report_error_to_discord
 from backend.app.services.readwise_processor import run_frequent_task
 from backend.app.logger import get_logger
 from threading import Thread

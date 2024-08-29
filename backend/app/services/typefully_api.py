@@ -5,7 +5,7 @@ import asyncio
 from typing import List, Dict, Any
 from ..config import Config
 from ..logger import get_logger
-from ..services.discord_bot import report_error_to_discord
+from .error_reporting import report_error_to_discord
 
 http = urllib3.PoolManager()
 
