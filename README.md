@@ -38,7 +38,8 @@ This project is an advanced social media automation tool that integrates various
    ```env
    DISCORD_BOT_TOKEN=your_discord_bot_token
    DISCORD_TWEET_CHANNEL_ID=123456789
-   DISCORD_THREAD_CHANNEL_ID=987654321
+   DISCORD_WIF_THREAD_CHANNEL_ID=987654321
+   DISCORD_BASIC_THREAD_CHANNEL_ID=456789123
    READWISE_TOKEN=your_readwise_token
    TYPEFULLY_API_KEY=your_typefully_api_key
    OPENAI_API_KEY=your_openai_api_key

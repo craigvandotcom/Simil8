@@ -45,43 +45,43 @@ class MyClient(commands.Bot):
     async def on_message(self, message):
         logger.info(f'Received message in channel: {message.channel.id}')
         try:
-            if message.channel.id == int(Config.DISCORD_TWEET_CHANNEL_ID):
-                logger.info(f'Received tweet message: {message.content}')
-                await self.process_tweet_content(message.content)
-            elif message.channel.id == int(Config.DISCORD_THREAD_CHANNEL_ID):
-                logger.info(f'Received thread message: {message.content}')
-                await self.process_thread_content(message.content)
+            channel_id = str(message.channel.id)
+            if channel_id in Config.CHANNEL_CONFIG_MAP:
+                channel_config = Config.CHANNEL_CONFIG_MAP[channel_id]
+                prompt_type = channel_config['prompt_type']
+                processor_name = channel_config['processor']
+                processor = getattr(self, processor_name, None)
+                if processor:
+                    await processor(message, prompt_type)
+                else:
+                    logger.warning(f'Processor not found: {processor_name}')
             else:
-                logger.info(f'Received message in unhandled channel: {message.channel.id}')
+                logger.info(f'Received message in unhandled channel: {channel_id}')
         except Exception as e:
             error_message = f"Error processing message: {str(e)}"
             logger.exception(error_message)
             await self.report_error(error_message)
 
-    async def process_tweet_content(self, message_content):
+    async def process_tweet_content(self, message, prompt_type):
         try:
-            logger.info(f"Starting to process tweet content: {message_content}")
-            logger.info("Calling to_tweet_variations")
-            tweet_versions = await to_tweet_variations(message_content)
-            logger.info(f"Received tweet versions: {tweet_versions}")
-            tweets = [message_content] + tweet_versions
-            logger.info(f"Combined tweets: {tweets}")
-            logger.info("Calling create_typefully_draft")
+            logger.info(f"Starting to process tweet content: {message.content}")
+            tweet_versions = await to_tweet_variations(message.content)
+            tweets = [message.content] + tweet_versions
             draft = await create_typefully_draft(tweets)
             logger.info(f"Generated tweet draft: {draft}")
         except Exception as e:
-            error_message = f"Error processing tweet content: {message_content}\n{str(e)}"
+            error_message = f"Error processing tweet content: {message.content}\n{str(e)}"
             logger.error(error_message)
             await self.report_error(error_message)
 
-    async def process_thread_content(self, message_content):
+    async def process_thread_content(self, message, prompt_type):
         try:
-            thread_draft = await to_thread(message_content)
-            thread = [message_content] + thread_draft
-            draft = await create_typefully_draft(thread)
+            channel_id = str(message.channel.id)
+            thread = await to_thread(message.content, prompt_type)
+            draft = await create_typefully_draft([message.content] + thread)
             logger.info(f"Generated thread draft: {draft}")
         except Exception as e:
-            error_message = f"Error processing thread content: {message_content}\n{str(e)}"
+            error_message = f"Error processing thread content: {message.content}\n{str(e)}"
             logger.exception(error_message)
             await self.report_error(error_message)
 

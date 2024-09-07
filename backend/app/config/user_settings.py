@@ -1,8 +1,5 @@
 # User-configurable settings
 
-# Number of tweet variations to generate
-TWEET_VARIATIONS_COUNT = 6
-
 # AI model to use for content generation ('gpt-4', 'claude-3-5-sonnet-20240620')
 AI_MODEL = 'claude-3-5-sonnet-20240620'
 
@@ -17,14 +14,27 @@ ENABLE_DISCORD_BOT = True
 ENABLE_READWISE_INTEGRATION = True
 ENABLE_TYPEFULLY_INTEGRATION = True
 
-# Prompt selection
-SYSTEM_PROMPT_KEY = 'system_prompt'
-TWEET_VARIATIONS_PROMPT_KEY = 'tweet_variations'
-BASIC_THREAD_PROMPT_KEY = 'basic_thread'
-WIF_THREAD_PROMPT_KEY = 'wif_thread'
+# Channel to prompt type and processor mapping
+CHANNEL_CONFIG_MAP = {
+    'DISCORD_TWEET_CHANNEL_ID': {
+        'prompt_type': 'TWEET_VARIATIONS',
+        'processor': 'process_tweet_content'
+    },
+    'DISCORD_WIF_THREAD_CHANNEL_ID': {
+        'prompt_type': 'WIF_THREAD',
+        'processor': 'process_thread_content'
+    },
+    'DISCORD_BASIC_THREAD_CHANNEL_ID': {
+        'prompt_type': 'BASIC_THREAD',
+        'processor': 'process_thread_content'
+    },
+    # Add more channel mappings as needed
+}
 
-# Prompt type selection
-THREAD_PROMPT_TYPE = WIF_THREAD_PROMPT_KEY  # or BASIC_THREAD_PROMPT_KEY
-TWEET_VARIATIONS_PROMPT_TYPE = TWEET_VARIATIONS_PROMPT_KEY  # Default to standard tweet variations
+# Prompt keys
+SYSTEM_PROMPT_KEY = 'SYSTEM_PROMPT'
+TWEET_VARIATIONS_PROMPT_KEY = 'TWEET_VARIATIONS'
+BASIC_THREAD_PROMPT_KEY = 'BASIC_THREAD'
+WIF_THREAD_PROMPT_KEY = 'WIF_THREAD'
 
 # Add any other user-configurable settings here
