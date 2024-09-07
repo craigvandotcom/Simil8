@@ -1,0 +1,2 @@
+- input to caption template, thread template, tweet variations (wild card, unexpected), newsletter (free and paid)
+- image suggestions 

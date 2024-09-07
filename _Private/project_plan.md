@@ -7,17 +7,25 @@
 - [x] Implement robust error handling and logging mechanisms
 - [x] Implement a second Discord channel for a basic thread prompt
 - [x] Rename DISCORD_THREAD_CHANNEL_ID to DISCORD_WIF_THREAD_CHANNEL_ID
+- [x] triple Readwise thread draft being created
+- [ ] pytest not working properly - setup pytest to test each feature (APIs, actions)
+- [ ] remove num_variations
+- [ ] add tweet variation plus general suggestion - make personal, about me (when I, because I, etc.)
+- [ ] add image suggestions per tweet for tweets & threads to add to drafts
+- [ ] add thread flows: listicle of most actionable high-value tips
 
 ## 2. Replit Database Integration
 - [ ] Implement functions for CRUD operations using Replit's database
 - [ ] Create a data model for storing markdown files and user data
 - [ ] Ensure strict data isolation between users (e.g., by prefixing all keys with user ID)
+- [ ] Conduct code reviews and refactoring sessions
 
 ## 3. Authentication System
 - [ ] Implement user registration and login functionality
 - [ ] Set up session management
 - [ ] Create protected routes for authenticated users
 - [ ] Implement security best practices (e.g., input validation, CSRF protection, secure headers)
+- [ ] Conduct code reviews and refactoring sessions
 
 ## 4. Markdown File Management API
 - [ ] Develop API endpoints for creating, reading, updating, and deleting markdown files

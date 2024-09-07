@@ -181,3 +181,12 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Contact
 For support or to report issues, please open an issue on the GitHub repository.
+
+## Changelog
+
+### Version 0.1.1
+
+- **Fixed**: Discord bot
+- **Fixed**: Tweet variations flow
+- **Fixed**: Thread flow
+- **Fixed**: Readwise highlight task bug
