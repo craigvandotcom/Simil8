@@ -9,10 +9,25 @@
 - [x] Rename DISCORD_THREAD_CHANNEL_ID to DISCORD_WIF_THREAD_CHANNEL_ID
 - [x] triple Readwise thread draft being created
 - [ ] pytest not working properly - setup pytest to test each feature (APIs, actions)
-- [ ] remove num_variations
+- [x] remove num_variations
 - [ ] add tweet variation plus general suggestion - make personal, about me (when I, because I, etc.)
+- [ ] change readwise drafts to more # tweet variations
+
+## Personal Features
+- [x] setup second X/Typefully account: Practical/Pragmatic Impact
+- [ ] classify incoming text: 9 domains
+  - [ ] if this domain, then use that Typefully credential for draft
+- [ ] fetch published posts from Typefully or X and add to domain-specific notes
+  - [ ] if this domain, store published post in this note
+
+### More flows:
 - [ ] add image suggestions per tweet for tweets & threads to add to drafts
-- [ ] add thread flows: listicle of most actionable high-value tips
+- [ ] add thread flows:
+  - [ ] listicle of most actionable high-value tips
+  - [ ] listicle of most interesting facts
+
+---
+
 
 ## 2. Replit Database Integration
 - [ ] Implement functions for CRUD operations using Replit's database

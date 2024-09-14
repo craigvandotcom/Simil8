@@ -67,11 +67,11 @@ By following these enhanced guidelines, you will consistently produce high-quali
 
 
 TWEET_VARIATIONS = """
-Transform the following text into 6 diverse, high-impact tweet versions:
+Transform the following text into a maximum of 10 diverse, high-impact tweet variations:
 Input Text: "{text}"
 
 General Guidelines:
-• Create exactly 6 tweet versions, each adhering to the 280-character limit.
+• Create exactly 10 tweet variations, each adhering to the 280-character limit.
 • Expand on the core ideas, provide additional context, or relate to broader concepts.
 • Optimize for engagement, readability, and value delivery.
 • Use active voice and concise language.
@@ -79,7 +79,7 @@ General Guidelines:
 • Avoid hashtags and rhetorical questions.
 • Ensure each tweet is self-contained and impactful on its own.
 
-Specific Objectives for Each Tweet Variation:
+Objectives for different tweet variations:
 
 1. Enhanced Original:
    • Refine the original text for optimal tweet performance while maintaining its core essence.
@@ -113,6 +113,22 @@ Specific Objectives for Each Tweet Variation:
    • Create a sense of possibility and personal empowerment.
    • End with a subtle yet effective call-to-action.
 
+7. Unexpected Insight:
+   • Present a surprising or counterintuitive insight that challenges the reader's assumptions.
+   • Use a powerful, emotive language that resonates with the target audience.
+   • Incorporate an unexpected connection or interdisciplinary insights.
+
+8. Personal Reflection:
+   • Pose a thought-provoking question or reflection that invites the reader to engage with the content on a personal level.
+   • Use a powerful, emotive language that resonates with the target audience.
+   • Create a sense of introspection and personal relevance.
+   • End with a subtle yet effective call-to-action.
+
+9. Call-to-Action with a Twist:
+   • Encourage the reader to take immediate action with a unique, low-barrier first step.
+   • Provide a simple method for readers to track their progress or share their journey.
+   • End with an open-ended question that invites reflection and engagement.
+
 Content Enrichment Strategies:
 • Relate the core message to current trends or timeless principles in business, psychology, or philosophy.
 • Incorporate relevant data points or expert opinions to bolster credibility.
@@ -137,7 +153,7 @@ By adhering to these enhanced guidelines, generate 6 diverse, high-impact tweets
 
 
 BASIC_THREAD = """
-Transform the following text into a compelling and coherent thread of 5 tweets:
+Transform the following text into a compelling and coherent thread of tweets:
 
 Input Text: "{text}"
 
@@ -151,31 +167,31 @@ General Guidelines:
 • Use active voice and concise language for maximum impact.
 • Incorporate relevant data points, expert opinions, or vivid analogies to enrich content.
 • Avoid hashtags and rhetorical questions.
-• Number each tweet (1/5, 2/5, etc.) at the beginning for clear thread structure.
+• Number each tweet (1/, 2/, etc.) at the beginning for clear thread structure.
 
 Specific Tweet Objectives:
 
-1. Hook and Introduction (1/5):
+1. Hook and Introduction (1 tweet):
    • Capture attention with a powerful opening statement or surprising fact.
    • Clearly state the main idea or problem the thread will address.
    • Hint at the value readers will gain from the full thread.
 
-2. Core Concept Elaboration (2/5):
+2. Core Concept Elaboration (2 - 5 tweets):
    • Dive deeper into the central idea presented in the input text.
    • Provide context, background, or theoretical framework.
    • Use a concrete example or case study to illustrate the concept.
 
-3. Practical Application or Implications (3/5):
+3. Practical Application or Implications (1 tweet):
    • Translate the core concept into actionable insights or strategies.
    • Offer step-by-step guidance or a framework for implementation.
    • Address potential challenges or common misconceptions.
 
-4. Broader Context and TL;DR (4/5):
+4. Broader Context and TL;DR (1 tweet):
    • Connect the main idea to larger trends, disciplines, or philosophies.
    • Provide a succinct TL;DR (Too Long; Didn't Read) summary of the key takeaway.
    • Reinforce the relevance and importance of the concept to the reader's life or work.
 
-5. Conclusion and Call-to-Action (5/5):
+5. Conclusion and Call-to-Action (1 tweet):
    • Summarize the thread's main points concisely.
    • Offer a final, impactful insight or reflection.
    • Include a subtle yet effective call-to-action that encourages application or further exploration.
@@ -288,4 +304,95 @@ Example Output Format:
 ["1/8 Attention-grabbing hook content", "2/8 Core wisdom content", "3/8 Relevance content", ...]
 
 By adhering to these enhanced guidelines, generate an insightful, engaging, and actionable 8-tweet thread that expands on the input text, delivers exceptional value, and motivates your audience of growth-minded professionals to implement the wisdom effectively.
+"""
+
+
+SUMMARY_THREAD = """
+Transform the following text into a compelling and coherent thread of tweets using the Enhanced Summary Framework (ESF):
+
+Input Text: "{text}"
+
+Enhanced Summary Framework (ESF):
+
+Your aim is to transform the input text into a thread. 
+
+Whatever inherent structure is present in the input text, you should maintain it in the structure of the output thread. If the structure is not present, you should add a structure which serves the input text's purpose.
+
+Tweet 1, Hook: 6 Proven Ways To Hook Our Reader's Attention (With Examples)
+
+1. Open with a strong, declarative sentence.
+   • Becoming successful doesn't just "happen."
+   • You can't change the world without first changing yourself.
+   • The wealthiest people on the planet have the simplest investment portfolios.
+
+2. Open with a thought-provoking question.
+   • Did you know the average Millennial has less than $10,000 in their savings account?
+   • Is artistic talent innate? Or can it be taught?
+   • Is there such a thing as eternal happiness?
+
+3. Open with a controversial opinion.
+   • It's impossible to be both rich and happy.
+   • The U.S. should not be involved in the war between Russia and Ukraine.
+   • If you drive a Tesla, you don't actually care about the environment—you just want people to think you do.
+
+4. Open with a moment in time.
+   • My fear of cafeteria trays began in 8th grade.
+   • At 5:46 AM Pacific Time, September 11th, 2001, America changed forever.
+   • When I was 17 years old, I became one of the highest-ranked World of Warcraft players in North America.
+
+5. Open with a vulnerable statement.
+   • For 27 years, I've struggled with alcoholism.
+   • For the first 10 years of my career, I was a terrible employee.
+   • By the time I closed the doors of my first company, I'd lost more than $10 million of investor money.
+
+6. Open with a weird, unique insight.
+   • Did you know that 85% of the world's oxygen comes from phytoplankton?
+   • Crows are one of the most intelligent animals on planet earth.
+   • My wife can boil a dozen eggs in 7 minutes or less.
+
+Tweet 2, Trust: Validation
+- This is tweet is aimed at gaining the readers trust - why should they keep reading my thread?
+- I am an expert, I have applied this wisdom with great success, and I have helped many others apply this wisdom successfully. But it is not enough to say that - we need to give relatable concrete examples which implicitly communicate these things.
+
+Following Tweets, Core Wisdom and Context:
+- This is the core wisdom and context of the thread.
+- The structure of this thread section should match, complement or improve the input text's structure.
+- Use your wisdome to design th body of the thread, keeping it as consistent and coherent with the input as possible. Remember, this is intended to be a transformation of medium, not a change in the message.
+
+Second-last tweet, Broader Context and TL;DR:
+   • Connect the main idea to larger trends, disciplines, or philosophies.
+   • Provide a succinct TL;DR (Too Long; Didn't Read) summary of the key takeaway.
+   • Reinforce the relevance and importance of the concept to the reader's life or work.
+
+Final Tweet, Conclusion and Call-to-Action:
+   • Summarize the thread's main points concisely.
+   • Offer a final, impactful insight or reflection.
+   • Include a subtle yet effective call-to-action that encourages application or further exploration.
+
+Enhanced Instructions:
+- Strictly adhere to the 280-character limit for each tweet
+• Maintain a consistent, authoritative yet approachable tone throughout the thread
+• Use active voice, powerful verbs, and concise language for maximum impact
+• Seamlessly transition between tweets, using linguistic bridges and open loops to maintain engagement
+• Integrate relevant interdisciplinary insights from to support the main ideas
+• Use the "Curiosity Gap" technique to maintain interest throughout the thread
+• Anticipate and address potential objections or skepticism within the thread
+
+Audience Considerations:
+• Tailor language, examples, and applications for educated professionals interested in spirituality, personal growth, productivity, and business insights
+• Assume a high level of intellect and curiosity, balancing depth with accessibility
+
+Engagement Optimization:
+• Use power words and emotive language strategically to evoke reader response
+• Incorporate "mini-cliffhangers" at the end of select tweets to encourage full thread reading
+• Use varied sentence structures and rhythms to maintain reader interest
+
+Output Formatting:
+• Provide the tweets as a valid JSON array of strings
+• Ensure each tweet is a complete, self-contained string within the array
+• Include tweet numbering (1/, 2/, etc.) at the start of each tweet
+• Your output should consist solely of this JSON array, with no additional commentary
+
+Example Output Format:
+["1/ Attention-grabbing hook content", "2/ Core wisdom content", "3/ Relevance content", ...]
 """
