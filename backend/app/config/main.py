@@ -12,7 +12,8 @@ class Config:
 
     # Add comments for each configuration variable
     READWISE_TOKEN = os.environ.get('READWISE_TOKEN')  # API token for Readwise integration
-    TYPEFULLY_API_KEY = os.environ.get('TYPEFULLY_API_KEY')  # API key for Typefully integration
+    TYPEFULLY_API_KEY = os.environ.get('TYPEFULLY_API_KEY')  # API key for Typefully integration (account1)
+    TYPEFULLY_API_KEY_ACCOUNT2 = os.environ.get('TYPEFULLY_API_KEY_ACCOUNT2')  # API key for Typefully account2 integration
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')  # API key for OpenAI services
     DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN')  # Discord bot token
     DISCORD_TWEET_CHANNEL_ID = os.environ.get('DISCORD_TWEET_CHANNEL_ID')  # Discord channel ID for tweets
@@ -26,8 +27,9 @@ class Config:
     truthy_values = {'true', '1', 'yes', 'on'}
     IS_PRODUCTION = replit_deployment_raw in truthy_values
 
-    PORT = int(os.environ.get('PORT', '80'))
-    
+    # Ensure PORT is set correctly
+    PORT = int(os.environ.get('PORT', '8000'))  # Default to 8000 if PORT is not set
+
     # Use READWISE_TASK_FREQUENCY from user_settings
     READWISE_TASK_FREQUENCY = READWISE_TASK_FREQUENCY
 
@@ -51,6 +53,8 @@ class Config:
 
     TWEET_VARIATIONS_PROMPT_TYPE = 'TWEET_VARIATIONS'
 
+    SIMIL8_API_KEY = os.environ.get('SIMIL8_API_KEY')  # Changed from API_KEY to SIMIL8_API_KEY
+
     @staticmethod
     def check_environment_variables():
         """
@@ -60,7 +64,8 @@ class Config:
         required_vars = [
             'DISCORD_BOT_TOKEN', 'DISCORD_TWEET_CHANNEL_ID', 'DISCORD_WIF_THREAD_CHANNEL_ID',
             'DISCORD_BASIC_THREAD_CHANNEL_ID', 'READWISE_TOKEN', 'TYPEFULLY_API_KEY', 'OPENAI_API_KEY',
-            'ANTHROPIC_API_KEY', 'DISCORD_ERROR_CHANNEL_ID', 'DISCORD_HEALTH_CHECK_CHANNEL_ID'
+            'ANTHROPIC_API_KEY', 'DISCORD_ERROR_CHANNEL_ID', 'DISCORD_HEALTH_CHECK_CHANNEL_ID',
+            'SIMIL8_API_KEY'  # Changed from API_KEY to SIMIL8_API_KEY
         ]
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         if missing_vars:

@@ -10,18 +10,25 @@
 - [x] triple Readwise thread draft being created
 - [ ] pytest not working properly - setup pytest to test each feature (APIs, actions)
 - [x] remove num_variations
-- [ ] add tweet variation plus general suggestion - make personal, about me (when I, because I, etc.)
-- [ ] change readwise drafts to more # tweet variations
+- [x] add tweet variation plus general suggestion - make personal, about me (when I, because I, etc.)
+- [x] change readwise drafts to more # tweet variations
 
 ## Personal Features
 - [x] setup second X/Typefully account: Practical/Pragmatic Impact
-- [ ] classify incoming text: 9 domains
-  - [ ] if this domain, then use that Typefully credential for draft
-- [ ] fetch published posts from Typefully or X and add to domain-specific notes
-  - [ ] if this domain, store published post in this note
+- [x] typefully draft function, add different account parameter
+- [x] setup endpoint to receive tweet and/or thread list, which then posts drafts (with tweet variations AND w/o) w. option to choose account and or other prompt (tweet vars) and scheduled or not
+- [x] setup webhook templates
+- [x] add image per tweet for threads published to X
+- [x] discord to tweet variations -> publish immediately to X without Typefully
+
+## GDrive Journal bot
+- [ ] save all highlights to today's journal
+- [ ] 
+
+Save published & High-performing tweets to journals:
+- [ ] figure out how with local Simil8
 
 ### More flows:
-- [ ] add image suggestions per tweet for tweets & threads to add to drafts
 - [ ] add thread flows:
   - [ ] listicle of most actionable high-value tips
   - [ ] listicle of most interesting facts

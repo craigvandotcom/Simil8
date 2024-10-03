@@ -86,15 +86,7 @@ class MyClient(commands.Bot):
             await self.report_error(error_message)
 
     async def report_error(self, error_message):
-        channel_id = Config.DISCORD_ERROR_CHANNEL_ID
-        try:
-            channel = self.get_channel(int(channel_id))
-            if channel:
-                await channel.send(f"⚠️ Error: {error_message}")
-            else:
-                logger.error(f"Could not find error reporting channel (ID: {channel_id}). Error: {error_message}")
-        except Exception as e:
-            logger.exception(f"Failed to report error to Discord: {str(e)}\nOriginal error: {error_message}")
+        await report_error_to_discord(error_message)
 
     @tasks.loop(time=time(hour=6))  # Run daily at 6 AM
     async def daily_health_check(self):
@@ -111,38 +103,12 @@ class MyClient(commands.Bot):
             logger.error("Could not find health check channel")
 
 # Add this import
-from .error_reporting import set_error_reporter
+from .error_reporting import report_error_to_discord
 
-# Replace the existing report_error_to_discord function with this:
-async def report_error_to_discord(error_message: str, bot: MyClient = None):
-    channel_id = Config.DISCORD_ERROR_CHANNEL_ID
-    try:
-        if bot:
-            channel = bot.get_channel(int(channel_id))
-        else:
-            logger.error("Bot instance not available for error reporting")
-            return
-        if channel:
-            await channel.send(f"⚠️ Error: {error_message}")
-        else:
-            logger.error(f"Could not find error reporting channel (ID: {channel_id}). Error: {error_message}")
-    except Exception as e:
-        logger.exception(f"Failed to report error to Discord: {str(e)}\nOriginal error: {error_message}")
-
-# Modify the setup_and_run_bot function:
+# Define the setup_and_run_bot function
 async def setup_and_run_bot():
-    try:
-        bot = MyClient()
-        set_error_reporter(lambda msg: report_error_to_discord(msg, bot))
-        await bot.start(Config.DISCORD_BOT_TOKEN)
-    except Exception as e:
-        error_message = f"Failed to start Discord bot: {str(e)}"
-        logger.exception(error_message)
-        # We can't use report_error_to_discord here because the bot isn't started
-        logger.error(f"Bot startup error: {error_message}")
+    client = MyClient()
+    await client.start(Config.DISCORD_BOT_TOKEN)
 
-# Remove this line as it's no longer needed
-# set_error_reporter(report_error_to_discord)
-
-# Add this at the end of the file to make setup_and_run_bot available for import
+# Export the function for import
 __all__ = ['setup_and_run_bot']
