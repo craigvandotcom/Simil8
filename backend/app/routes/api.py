@@ -105,28 +105,33 @@ def create_typefully_threads_weekly():
         if account not in ['account1', 'account2']:
             return jsonify({'error': 'Invalid account specified'}), 400
 
-        if not threads or len(threads) > 3:
-            return jsonify({'error': 'Please provide 1-3 threads'}), 400
+        if not threads:
+            return jsonify({'error': 'Please provide at least one thread'}), 400
 
-        # Get the next Monday, Wednesday, and Friday
+        # Get today's date and day of the week
         today = datetime.now().date()
-        next_monday = today + timedelta(days=(7 - today.weekday()) % 7)
-        next_wednesday = next_monday + timedelta(days=2)
-        next_friday = next_monday + timedelta(days=4)
+        today_weekday = today.weekday()
 
-        # Create a list of scheduling times
+        # Define the target weekdays (Monday = 0, Wednesday = 2, Friday = 4)
+        target_weekdays = [0, 2, 4]
+
+        # Find scheduling slots for all threads
+        schedule_dates = []
+        current_date = today
+        while len(schedule_dates) < len(threads):
+            if current_date.weekday() in target_weekdays and (current_date > today or current_date.weekday() > today_weekday):
+                schedule_dates.append(current_date)
+            current_date += timedelta(days=1)
+
+        # Create a list of scheduling times (all at 4 PM)
         schedule_times = [
-            datetime.combine(next_monday, datetime.min.time().replace(hour=16, minute=0)),
-            datetime.combine(next_wednesday, datetime.min.time().replace(hour=14, minute=0)),
-            datetime.combine(next_friday, datetime.min.time().replace(hour=12, minute=0))
+            datetime.combine(date, datetime.min.time().replace(hour=16, minute=0))
+            for date in schedule_dates
         ]
 
         results = []
 
         for index, thread in enumerate(threads):
-            if index >= 3:  # Ensure we don't schedule more than 3 threads
-                break
-
             schedule_date = schedule_times[index].isoformat()
             
             # Use asyncio.run to execute the async function
